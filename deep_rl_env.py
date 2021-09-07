@@ -18,7 +18,7 @@ class Channel:
 
 class DeepRlEnv(BaseEnv):
     """
-        Tomo Env for a model with individual heads
+        Env for a model with individual heads
     """
     def setup_env(self, model_path: str) -> Callable:
         self.past_ssim_db = 0
@@ -28,11 +28,11 @@ class DeepRlEnv(BaseEnv):
         self.delay_history = deque(maxlen=HISTORY_LEN)
         self.reward_history = deque(maxlen=HISTORY_LEN)
         self.reward_func = make_reward_function()
-        self.max_video_size = 3 # MB
+        self.max_video_size = 3 # Mb
         self.max_reward = 5
         self.max_quality = 30 # SSIM dB
         self.max_delay = 20 # s
-        self.max_throughput = 25 # MB/s
+        self.max_throughput = 25 # Mb/s
         self.max_buffer = 15 # s
         for _ in range(HISTORY_LEN):
             self.throughput_history.append(0)
@@ -41,7 +41,7 @@ class DeepRlEnv(BaseEnv):
         model = DeepRlModel()
         model.load_state_dict(th.load(model_path))
         model.eval()
-        th.set_num_threads(1) # Follow Pensieve code in puffer
+        th.set_num_threads(1) # follow Pensieve code in third_party/
         return model
 
     def process_env_info(self, env_info: dict) -> dict:
@@ -52,7 +52,7 @@ class DeepRlEnv(BaseEnv):
             self.channel.chunks_sent = 0
         is_init = self.channel.chunks_sent <= 1 # first or second chunk
 
-        if self.past_action is not None:
+        if self.past_action is not None: # avoid doing extra work on zeros for very first action
             env_info["past_chunk"]["ssim_db"] = ssim_index_to_db(
                 env_info["past_chunk"]["ssim"])
             if not is_init:
