@@ -7,4 +7,4 @@ To add a controller, create a class extending `BaseEnv`, implement the functions
 
 This means that `process_env_info` handles everything from frame stacking, invalid input by the Puffer and normalization, while `setup_env` simply returns a model that the env can query when needed. 
 
-For an example, see `deep_rl_env.py`.
+For an example, see `tara_env.py`.
