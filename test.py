@@ -2,11 +2,11 @@
 
 # A default shebang is set, but it may not point to the expected python path
 import sys
-from deep_rl_env import DeepRlEnv
+from tara_env import TaraEnv
 
 
 NAME_TO_ENV = {
-    "deep_rl": DeepRlEnv
+    "tara": TaraEnv
 }
 
 def main(args):

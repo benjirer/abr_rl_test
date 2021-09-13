@@ -3,7 +3,7 @@ from torch import nn
 from torch.distributions import Categorical
 
 
-class DeepRlModel(nn.Module):
+class TaraModel(nn.Module):
     """
         Conv-1D extractor for ABR with individual heads,
         similar in part to https://github.com/hongzimao/pensieve/blob/master/sim/a3c.py
@@ -11,7 +11,7 @@ class DeepRlModel(nn.Module):
 
     def __init__(self, look_ahead_horizon: int = 5, n_actions: int = 10,
                 feature_dim: int = 897):
-        super(DeepRlModel, self).__init__()
+        super(TaraModel, self).__init__()
         self.quality_net = nn.Sequential(nn.Linear(1, 32), nn.ReLU())
         self.buffer_net = nn.Sequential(nn.Linear(1, 32), nn.ReLU())
         self.throughput_net = nn.Sequential(

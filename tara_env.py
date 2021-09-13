@@ -1,10 +1,17 @@
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+
+import torch as th
+th.set_num_threads(1) # follow Pensieve code in third_party/
+
 from base_env import BaseEnv
 from utils import make_reward_function, ssim_index_to_db, normalize
 from typing import Callable, Union
 import numpy as np
-import torch as th
 from collections import deque
-from deep_rl_model import DeepRlModel
+from tara_model import TaraModel
 from dataclasses import dataclass
 
 HISTORY_LEN = 10
@@ -16,7 +23,7 @@ class Channel:
     chunks_sent: int = 0
 
 
-class DeepRlEnv(BaseEnv):
+class TaraEnv(BaseEnv):
     """
         Env for a model with individual heads
     """
@@ -38,10 +45,9 @@ class DeepRlEnv(BaseEnv):
             self.throughput_history.append(0)
             self.delay_history.append(0)
             self.reward_history.append(0)
-        model = DeepRlModel()
+        model = TaraModel()
         model.load_state_dict(th.load(model_path))
         model.eval()
-        th.set_num_threads(1) # follow Pensieve code in third_party/
         return model
 
     def process_env_info(self, env_info: dict) -> dict:
