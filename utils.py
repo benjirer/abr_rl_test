@@ -7,16 +7,25 @@ class RewardWeights(NamedTuple):
     rebuf_weight: float = 100
     quality_change_weight: float = 1
 
-# defined initially in https://arxiv.org/abs/1805.11593
-def sqrt_norm_function(reward: float, min_reward: float = 0, 
-        max_reward: float = 5) -> float:
-    reward = np.sign(reward) * ((np.sqrt(np.abs(reward) + 1) - 1) + \
-                                                        0.001 * reward)
-    reward = np.clip(reward, min_reward, max_reward)
-    return reward
+def make_norm_function(style: str, 
+        support_size_min: float = -5, support_size_max: float = 5):
+    if style not in ["sqrt_clip", "none"]:
+        raise NotImplementedError("Norm style not implemented.")
+    if style == "sqrt_clip":
+        # defined initially in https://arxiv.org/abs/1805.11593
+        def norm_func(reward):
+            reward = np.sign(reward) * ((np.sqrt(np.abs(reward) + 1) - 1) + \
+                                                                0.001 * reward)
+            reward = np.clip(reward, support_size_min, support_size_max)
+            return reward
+        return norm_func
+    elif style == "none":
+        def norm_func(reward):
+            return reward
+        return norm_func
 
 def make_reward_function(weights: RewardWeights= RewardWeights(), 
-            norm_function: Callable= sqrt_norm_function) -> Callable:
+            norm_function: Callable = make_norm_function("none")) -> Callable:
     def reward_function(quality, rebuf, quality_change) -> float:
         reward = weights.quality_weight * quality - \
             weights.rebuf_weight * rebuf - \

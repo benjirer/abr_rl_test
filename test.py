@@ -3,10 +3,13 @@
 # A default shebang is set, but it may not point to the expected python path
 import sys
 from tara_env import TaraEnv
-
+from maguro_env import MaguroEnv
 
 NAME_TO_ENV = {
-    "tara": TaraEnv
+    "tara": TaraEnv,
+    "maguro": MaguroEnv,
+    "unagi": MaguroEnv
+    
 }
 
 def main(args):

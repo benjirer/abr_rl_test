@@ -7,7 +7,7 @@ import torch as th
 th.set_num_threads(1) # follow Pensieve code in third_party/
 
 from base_env import BaseEnv
-from utils import make_reward_function, ssim_index_to_db, normalize
+from utils import make_reward_function, ssim_index_to_db, normalize, make_norm_function
 from typing import Callable, Union
 import numpy as np
 from collections import deque
@@ -34,7 +34,8 @@ class TaraEnv(BaseEnv):
         self.throughput_history = deque(maxlen=HISTORY_LEN)
         self.delay_history = deque(maxlen=HISTORY_LEN)
         self.reward_history = deque(maxlen=HISTORY_LEN)
-        self.reward_func = make_reward_function()
+        reward_norm_function = make_norm_function("sqrt_clip", 0, 5)
+        self.reward_func = make_reward_function(norm_function=reward_norm_function)
         self.max_video_size = 3 # Mb
         self.max_reward = 5
         self.max_quality = 30 # SSIM dB
