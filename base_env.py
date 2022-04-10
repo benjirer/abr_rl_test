@@ -3,6 +3,7 @@ import json
 import socket
 import struct
 from typing import Any, Callable
+from pathlib import Path
 
 N_ACTIONS = 10
 ACTION_SPACE = [i for i in range(N_ACTIONS)]
@@ -10,7 +11,16 @@ ACTION_SPACE = [i for i in range(N_ACTIONS)]
 class BaseEnv:
     def __init__(self, model_path: str, server_address: str):
         self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        self.sock.connect(server_address)
+        server_path = Path(server_address)
+        if server_path.exists() and server_path.is_socket():
+            try:
+                self.sock.connect(server_address)
+            except:
+                print("Unable to connect Python IPC socket.")
+                raise RuntimeError
+        else:
+            print("Invalid Python IPC Path")
+            raise ValueError
         self.past_action = None
         self.model = self.setup_env(model_path)
 
@@ -59,11 +69,13 @@ class BaseEnv:
             try:
                 env_info = self._recv_env_info()
             except Exception as e:
-                raise RuntimeError("{}: {} {}".format(
+                print("{}: {} {}".format(
                     "Encountered error", e.args, "while receiving env info."))
+                raise RuntimeError
             model_input = self.process_env_info(env_info=env_info)
             action = self.model(model_input)
             if action not in ACTION_SPACE:
-                raise ValueError("Action not contained in the action space.")
+                print("Action not contained in the action space.")
+                raise ValueError
             self.past_action = action
             self._send_action(action)
